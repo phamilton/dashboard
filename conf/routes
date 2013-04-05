@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+
+GET 	/jenkins/refresh			controllers.JenkinsController.refresh
+
+GET     /jenkins/ws                 controllers.JenkinsController.sockHandler
+
+GET		/lm/refresh					controllers.LogicMonitorController.refresh
+
+GET		/lm/ws						controllers.LogicMonitorController.sockHandler
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

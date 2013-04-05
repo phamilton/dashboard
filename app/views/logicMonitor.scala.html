@@ -1,0 +1,98 @@
+@()(implicit request: RequestHeader)
+
+<script>
+
+var chart = null;
+
+function GraphDataCtrl($scope) {
+	
+	$scope.graphData = {};
+	
+	$scope.$watch('graphData', function(newValue, oldValue) {
+		 if (!$.isEmptyObject($scope.graphData)) {
+			 if (chart == null) {			 
+				 chart = new Highcharts.Chart({
+					 	chart: {
+					        renderTo: 'thegraph'
+					    },
+			            title: {
+			                text: 'Average Response Time'
+			            },
+			            xAxis: {
+			                type: 'datetime',
+			                title: {
+			                    text: null
+			                }
+			            },
+			            yAxis: {
+			                title: {
+			                    text: 'Response Time'
+			                },
+			            	min: 0, max: 40
+			            },
+			            tooltip: {
+			                shared: true
+			            },
+			            legend: {
+			                enabled: false
+			            },
+			            plotOptions: {
+			                area: {
+			                    fillColor: {
+			                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+			                        stops: [
+			                            [0, Highcharts.getOptions().colors[0]],
+			                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+			                        ]
+			                    },
+			                    lineWidth: 1,
+			                    marker: {
+			                        enabled: false
+			                    },
+			                    shadow: false,
+			                    states: {
+			                        hover: {
+			                            lineWidth: 1
+			                        }
+			                    },
+			                    threshold: null
+			                }
+			            },
+			            series: [{
+			            	type: 'area',
+			            	pointInterval: 1000 * 60 * 8,
+			                pointStart: $scope.graphData.data.startTime,
+			                data: $scope.graphData.data.lines[0].data
+			            }]
+			        });		
+			 } else {				 
+				 chart.series[0].setData($scope.graphData.data.lines[0].data);
+			 }
+		 }
+	});
+	
+	$(function() {
+		$.get('@routes.LogicMonitorController.refresh()', function(data) {
+			$scope.$apply(function() {				
+	            $scope.graphData = JSON.parse(data);            
+	        });
+		});
+		
+	    var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+	    var sock = new WS("@routes.LogicMonitorController.sockHandler().webSocketURL()")
+	    
+	    sock.onmessage = function(event) {
+	    	$scope.$apply(function() {
+	            $scope.graphData = JSON.parse(event.data);            
+	        });    	    	
+	    }     
+	});			  
+}
+
+</script>
+
+<div ng-controller="GraphDataCtrl" class="widget">
+	<div id="thegraph">
+	
+	</div>
+</div>

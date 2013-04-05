@@ -1,0 +1,23 @@
+@()(implicit request: RequestHeader)
+
+@main("Dashboard") {
+<script>
+$(function(){ //DOM Ready
+	 
+    $(".gridster ul").gridster({
+        widget_margins: [2, 2],
+        widget_base_dimensions: [150, 900],
+    	extra_cols: 5
+    });
+ 
+});
+
+</script>
+
+<div class="gridster">
+    <ul>
+        <li data-row="1" data-col="1" data-sizex="6" data-sizey="1">@views.html.jenkins()</li>
+        <li data-row="1" data-col="2" data-sizex="4" data-sizey="1">@views.html.logicMonitor()</li>
+    </ul>
+</div>
+}
